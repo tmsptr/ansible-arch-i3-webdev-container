@@ -1,0 +1,144 @@
+---
+ - hosts: all
+   become: true 
+   vars:
+    username: tomas
+    hostname: HVM
+   tasks:
+    - name: update
+      community.general.pacman:
+        upgrade: true
+        update_cache: true
+        
+    - name: change host name
+      shell: echo {{ hostname }} > /etc/hostname
+      
+    - name: install basics
+      community.general.pacman:
+        name: 
+         - xorg-fonts-misc
+         - xorg-fonts-type1
+         - xorg-twm 
+         - xorg-xclock 
+         - xterm
+         - base-devel
+         - virtualbox-guest-utils
+         - git
+         - vim
+         - gedit
+         - man
+         - nodejs
+         - npm
+         - xorg
+        state: present
+        
+    - name: Run Xorg configure command
+      command: Xorg :0 -configure
+      
+    - name: Move file from /root to /etc/X11
+      command: mv /root/xorg.conf.new /etc/X11/xorg.conf
+      
+    - name: install node things
+      community.general.pacman:
+        name: 
+         - nodejs
+         - npm
+        state: present
+        
+    - name: install desktop
+      community.general.pacman:
+        name: 
+         - xfce4
+         - xfce4-goodies
+         - lightdm
+         - lightdm-gtk-greeter
+        state: present
+        
+    - name: enable login manager
+      command: systemctl enable lightdm.service -f
+      
+    - name: install GUI things
+      community.general.pacman:
+        name: 
+         - chromium
+        state: present
+        
+    - name: CD
+      shell: cd /home/{{ username }}/ && git clone https://aur.archlinux.org/yay.git
+      args:
+        creates: /home/{{ username }}/yay
+        
+    - name: Change owner and group of yay 
+      file:
+        path: /home/{{ username }}/yay
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        recurse: yes
+        
+    - name: Install yay
+      shell: cd /home/{{ username }}/yay && makepkg -si --noconfirm
+      become_user: "{{ username }}"
+      
+    - name: Install AUR packages
+      command: yay -S vscodium-bin --noconfirm
+      become_user: "{{ username }}"
+      ignore_errors: true
+      
+    - name: install i3
+      community.general.pacman:
+        name:
+         - i3-wm
+         - polybar
+         - rofi
+         - ttf-font-awesome
+         - powerline
+         - powerline-fonts
+         - noto-fonts
+         - ttf-roboto
+         - ttf-roboto-mono
+         - ttf-roboto-mono-nerd
+         - powerline
+         - ttf-font-awesome
+         - ttf-nerd-fonts-symbols
+         - ttf-nerd-fonts-symbols-common
+         - gtk3
+         - rxvt-unicode
+         - conky
+         - adapta-gtk-theme
+        state: present
+        
+    - name: download configs
+      shell: cd /home/{{ username }}/ && git clone https://gitlab.com/atomsP/ricing-backup.git
+      args:
+        creates: /home/{{ username }}/ricing-backup
+      become_user: "{{ username }}"
+    
+    - name: Move i3 config
+      shell: mkdir -p /home/{{ username }}/.config/i3 && cp -r /home/{{ username }}/ricing-backup/i3/* /home/{{ username }}/.config/i3/
+      
+    - name: Move conky config
+      shell: mkdir -p /home/{{ username }}/.config/conky && cp -r /home/{{ username }}/ricing-backup/conky/* /home/{{ username }}/.config/conky/
+      
+    - name: Move polybar config
+      shell: mkdir -p /home/{{ username }}/.config/polybar && cp -r /home/{{ username }}/ricing-backup/polybar/* /home/{{ username }}/.config/polybar/
+      
+    - name: Move tools
+      shell: mkdir -p /home/{{ username }}/Tools/bin && cp -r /home/{{ username }}/ricing-backup/Tools/bin/* /home/{{ username }}/Tools/bin/
+      
+    - name: Move vim config
+      shell: cp -r /home/{{ username }}/ricing-backup/.vimrc /home/{{ username }}/
+      
+    - name: Move xdefaults
+      shell: cp -r /home/{{ username }}/ricing-backup/.Xdefaults /home/{{ username }}/
+      
+    - name: Move xresources
+      shell: cp -r /home/{{ username }}/ricing-backup/.Xresources /home/{{ username }}/
+      
+    - name: Move xinitrc
+      shell: cp -r /home/{{ username }}/ricing-backup/.xinitrc /home/{{ username }}/
+      
+    - name: Move zshrc
+      shell: cp -r /home/{{ username }}/ricing-backup/.zshrc /home/{{ username }}/
+      
+    - name: Reboot the virtual machine
+      reboot:

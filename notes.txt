@@ -1,0 +1,28 @@
+VBoxManage internalcommands sethduuid /path/to/disk.vdi
+
+in VBox:
+network, advanced. Create rule for ssh
+host ip: 127.0.0.1 port <>
+guest ip:<> port:22
+
+useradd -m <username>
+usermod -a -G wheel <username>
+passwd <username>
+(passwd archlinux)
+usermod -L archlinux
+
+pacman -Sy archlinux-keyring
+(pacman-key --refresh-keys)
+pacman -Syyu
+pacman -S python
+ssh-keygen
+
+ssh-copy-id -p<> <username>@127.0.0.1
+
+ready for ansible
+
+ansible-playbook <for all> --limit <to one> 
+xrandr --output <> --mode <>
+
+
+
