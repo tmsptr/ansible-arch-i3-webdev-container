@@ -1,28 +1,36 @@
 VBoxManage internalcommands sethduuid /path/to/disk.vdi
 
+Default user: osboxes (root)
+default pass: osboxes.org
+
 in VBox:
 network, advanced. Create rule for ssh
-host ip: 127.0.0.1 port <>
-guest ip:<> port:22
+host ip: 127.0.0.1 port <pick unused port>
+guest ip:<guest vm IP> port:22
 
 useradd -m <username>
 usermod -a -G wheel <username>
 passwd <username>
-(passwd archlinux)
-usermod -L archlinux
 
-pacman -Sy archlinux-keyring
-(pacman-key --refresh-keys)
-pacman -Syyu
+usermod -L osboxes //lock default user
+
+#pacman -S archlinux-keyring
+#pacman-key --refresh-keys
+
+pacman -Syu
+#pacman -S openssh
+//start/enable ssh deamon
 pacman -S python
 ssh-keygen
 
+//copy ssh keys from host
 ssh-copy-id -p<> <username>@127.0.0.1
 
 ready for ansible
 
-ansible-playbook <for all> --limit <to one> 
-xrandr --output <> --mode <>
+ansible-playbook (--limit <to one>) --ask-become
+in hosts provide host machine credentials with ansible_port
+xrandr --output Virtual1 --mode 1920x1080
 
 
 
