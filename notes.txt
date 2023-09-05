@@ -1,7 +1,7 @@
-VBoxManage internalcommands sethduuid /path/to/disk.vdi
+*VBoxManage internalcommands sethduuid /path/to/disk.vdi
 
-Default user: osboxes (root)
-default pass: osboxes.org
+*Default user: osboxes (root)
+*default pass: osboxes.org
 
 in VBox:
 network, advanced. Create rule for ssh
@@ -28,9 +28,14 @@ ssh-copy-id -p<> <username>@127.0.0.1
 
 ready for ansible
 
-ansible-playbook (--limit <to one>) --ask-become
-in hosts provide host machine credentials with ansible_port
-xrandr --output Virtual1 --mode 1920x1080
+*if issue with xdg-desktop-portal-gnome 44 still persists, downgrade:
+scp -P <...> <...>xdg-desktop-portal-gnome-43.1-1-x86_64.pkg.tar.zst <user>@127.0.0.1:/home/<...>
+make sure to --ignore it when updating
+
+*ansible-playbook (--limit <to one>) --ask-become
+*in hosts provide host machine credentials with ansible_port
+*xrandr --output Virtual1 --mode 1920x1080 but its not persistent between sessions
+*run playbook before X server is started, at display manager greet, if DE already present
 
 
 
